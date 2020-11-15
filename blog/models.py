@@ -4,15 +4,19 @@ from django.shortcuts import reverse
 from django.utils.text import slugify
 from time import time
 
+
 def gen_slug(s):
     new_slug = slugify(s, allow_unicode=True)
     return new_slug + '-' + str(int(time()))
 
+
 class Post(models.Model):
     title = models.CharField(max_length=150, db_index=True)
-    slug = models.SlugField(max_length=150, blank=True, unique=True)    #slug - человекопонятный url
-    body = models.TextField(blank=True, db_index=True)   #blank=True - это поле может быть пустым, db_index - флаг индексации (можно искать по содержанию)
-    date_pub = models.DateTimeField(auto_now_add=True)      #при сохранении публикации в базу данных, будет выставляться текущая дата
+    slug = models.SlugField(max_length=150, blank=True, unique=True)  # slug - человекопонятный url
+    # blank=True - это поле может быть пустым, db_index - флаг индексации (можно искать по содержанию)
+    body = models.TextField(blank=True, db_index=True)
+    # при сохранении публикации в базу данных, будет выставляться текущая дата
+    date_pub = models.DateTimeField(auto_now_add=True)
     tags = models.ManyToManyField('Tag', blank=True, related_name='posts')
 
     def get_absolute_url(self):
@@ -28,12 +32,13 @@ class Post(models.Model):
         if not self.id:
             self.slug = gen_slug(self.title)
         super().save(*args, **kwargs)
-    
+
     def __str__(self):
         return self.title
-    
+
     class Meta:
         ordering = ['-date_pub']
+
 
 class Tag(models.Model):
     title = models.CharField(max_length=50)
